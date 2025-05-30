@@ -49,6 +49,17 @@ docker-compose up --build
 ```
 A aplicação estará disponível em: http://localhost:8080/hello
 
+### 4. Chamada do endpoint
+Chamada **com** API Key:
+```bash
+curl -i -H "API_KEY: token_abc123" http://localhost:8080/hello
+```
+Chamada **sem** API Key:
+```bash
+curl -i http://localhost:8080/hello
+```
+
+
 ## 🧪 Executando Testes de Carga
 
 ### 1. Instale o Apache Bench (caso não tenha)
