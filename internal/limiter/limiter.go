@@ -10,8 +10,7 @@ type Limiter struct {
 	store            Store
 	defaultLimit     int
 	defaultBlockTime time.Duration
-	tokenLimits      map[string]int
-	tokenBlockTime   map[string]time.Duration
+	tokenLimits      *TokenLimitStore
 }
 
 func NewLimiter(store Store) *Limiter {
@@ -22,14 +21,15 @@ func NewLimiter(store Store) *Limiter {
 		store:            store,
 		defaultLimit:     defaultRateLimit,
 		defaultBlockTime: time.Duration(defaultBlockDuration) * time.Second,
-		tokenLimits:      make(map[string]int),
-		tokenBlockTime:   make(map[string]time.Duration),
+		tokenLimits:      NewTokenLimitStore(),
 	}
 }
 
 func (l *Limiter) SetTokenLimit(token string, limit int, blockTime time.Duration) {
-	l.tokenLimits[token] = limit
-	l.tokenBlockTime[token] = blockTime
+	l.tokenLimits.Set(token, TokenLimitConfig{
+		Limit:         limit,
+		BlockDuration: blockTime,
+	})
 }
 
 func (l *Limiter) Allow(key string, isToken bool) (bool, string, error) {
@@ -44,11 +44,11 @@ func (l *Limiter) Allow(key string, isToken bool) (bool, string, error) {
 	limit := l.defaultLimit
 	blockTime := l.defaultBlockTime
 	if isToken {
-		if tLimit, ok := l.tokenLimits[key]; ok {
-			limit = tLimit
+		if tLimit, ok := l.tokenLimits.Get(key); ok {
+			limit = tLimit.Limit
 		}
-		if tBlock, ok := l.tokenBlockTime[key]; ok {
-			blockTime = tBlock
+		if tBlock, ok := l.tokenLimits.Get(key); ok {
+			blockTime = tBlock.BlockDuration
 		}
 	}
 
