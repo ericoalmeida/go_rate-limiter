@@ -35,7 +35,7 @@ cd rate-limiter-go
 ```bash
 DEFAULT_RATE_LIMIT=5
 DEFAULT_BLOCK_DURATION=300
-REDIS_HOST=localhost:6379
+REDIS_HOST=redis:6379
 REDIS_PASSWORD=sysdba
 REDIS_DB=0
 RATE_LIMIT_TOKEN=100
@@ -63,7 +63,7 @@ brew install httpd
 
 ### 2. Exemplo: 5000 requisições com até 10 simultâneas
 ```bash
-ab -n 5000 -c 10 http://localhost:8080/hello
+ab -n 5000 -c 10 http://127.0.0.1:8080/hello
 ```
 
 ## 🧪 Testes unitários
