@@ -27,4 +27,4 @@ services:
     ports:
       - ${PORT}:${PORT}
     networks:
-      - net
+      - limiter
