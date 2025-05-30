@@ -2,8 +2,6 @@ package limiter
 
 import (
 	"time"
-
-	"github.com/ericoalmeida/go_rate-limiter/internal/configs"
 )
 
 type Limiter struct {
@@ -13,14 +11,11 @@ type Limiter struct {
 	tokenLimits      *TokenLimitStore
 }
 
-func NewLimiter(store Store) *Limiter {
-	defaultRateLimit := configs.GetEnvInt("DEFAULT_RATE_LIMIT", 5)
-	defaultBlockDuration := configs.GetEnvInt("DEFAULT_BLOCK_DURATION", 300)
-
+func NewLimiter(store Store, rateLimit, blockDuration int) *Limiter {
 	return &Limiter{
 		store:            store,
-		defaultLimit:     defaultRateLimit,
-		defaultBlockTime: time.Duration(defaultBlockDuration) * time.Second,
+		defaultLimit:     rateLimit,
+		defaultBlockTime: time.Duration(blockDuration) * time.Second,
 		tokenLimits:      NewTokenLimitStore(),
 	}
 }

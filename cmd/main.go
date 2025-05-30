@@ -18,6 +18,8 @@ func main() {
 	redisHost := configs.GetEnv("REDIS_HOST")
 	redisPassword := configs.GetEnv("REDIS_PASSWORD")
 	redisDbInt := configs.GetEnvInt("REDIS_DB", 0)
+	defaultRateLimit := configs.GetEnvInt("DEFAULT_RATE_LIMIT", 5)
+	defaultBlockDuration := configs.GetEnvInt("DEFAULT_BLOCK_DURATION", 300)
 
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:         redisHost,
@@ -29,7 +31,7 @@ func main() {
 
 	store := limiter.NewRedisStore(redisClient)
 
-	rateLimiter := limiter.NewLimiter(store)
+	rateLimiter := limiter.NewLimiter(store, defaultRateLimit, defaultBlockDuration)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
