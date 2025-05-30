@@ -4,30 +4,32 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/ericoalmeida/go_rate-limiter/internal/configs"
 	"github.com/ericoalmeida/go_rate-limiter/internal/limiter"
 	"github.com/ericoalmeida/go_rate-limiter/internal/middleware"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
 	configs.LoadConfig()
 
-	redisAddr := configs.GetEnv("REDIS_ADDR")
+	port := configs.GetEnv("PORT")
+	redisHost := configs.GetEnv("REDIS_HOST")
 	redisPassword := configs.GetEnv("REDIS_PASSWORD")
 	redisDbInt := configs.GetEnvInt("REDIS_DB", 0)
 
-	store := limiter.NewRedisStore(
-		redisAddr,
-		redisPassword,
-		redisDbInt,
-	)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:         redisHost,
+		Password:     redisPassword,
+		DB:           redisDbInt,
+		PoolSize:     20,
+		MinIdleConns: 10,
+	})
+
+	store := limiter.NewRedisStore(redisClient)
 
 	rateLimiter := limiter.NewLimiter(store)
-
-	// exemplo de token personalizado com 100 req/s e bloqueio de 1 min
-	rateLimiter.SetTokenLimit("abc123", 100, 60*time.Second)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
@@ -35,6 +37,6 @@ func main() {
 	})
 
 	handler := middleware.RateLimiterMiddleware(rateLimiter)(mux)
-	log.Println("Server running at :8080")
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	log.Println("Server running at :" + port)
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }

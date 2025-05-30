@@ -11,3 +11,20 @@ services:
       - "6379:6379"
     networks:
       - limiter
+    command: redis-server --requirepass sysdba
+  
+  app:
+    container_name: app_rate_limiter
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    expose:
+      - ${PORT}
+    ports:
+      - ${PORT}:${PORT}
+    networks:
+      - net
