@@ -27,8 +27,8 @@ O rate limiter é configurável por meio de variáveis de ambiente e utiliza o *
 
 ### 1. Clone o repositório
 ```bash
-git clone https://github.com/seu-usuario/rate-limiter-go.git
-cd rate-limiter-go
+git clone https://github.com/ericoalmeida/go_rate-limiter.git
+cd go_rate-limiter
 ```
 
 ### 2. Configure o .env
